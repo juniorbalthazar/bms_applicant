@@ -29,8 +29,16 @@ public class RetrytableRepo {
     private  BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository;
     private BmsTxRepository bmsTxRepository;
     private BmsTxProcessRepository bmsTxProcessRepository;
+    private SettingRepository settingRepo;
+    private BmsInstitutionRepository bmsInstitutionRepository;
+    private BmsOfficeRepository  bmsOfficeRepository;
+    private BmsOfficeServiceRepository bmsOfficeServiceRepository;
 
-    public RetrytableRepo(BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository, BmsApplicantRepository applicantRepository, BmsApplicantsCertificatRepository applicantsCertificatRepository, BmsApplicantsFingerprintRepository applicantsFingerprintRepository, BmsApplicantsIdentityRepository applicantsIdentityRepository,BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository, BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository, BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository,BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository,BmsTxRepository bmsTxRepository,BmsTxProcessRepository bmsTxProcessRepository){
+    public RetrytableRepo(BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository, BmsApplicantRepository applicantRepository, BmsApplicantsCertificatRepository applicantsCertificatRepository,
+                          BmsApplicantsFingerprintRepository applicantsFingerprintRepository, BmsApplicantsIdentityRepository applicantsIdentityRepository,BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository,
+                          BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository, BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository,BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository,
+                          BmsTxRepository bmsTxRepository,BmsTxProcessRepository bmsTxProcessRepository,SettingRepository settingRepo,BmsInstitutionRepository bmsInstitutionRepository,BmsOfficeRepository  bmsOfficeRepository,
+                          BmsOfficeServiceRepository bmsOfficeServiceRepository){
 
         this.applicantDemandeMotifRepository = applicantDemandeMotifRepository;
         this.applicantRepository = applicantRepository;
@@ -43,6 +51,10 @@ public class RetrytableRepo {
         this.bmsApplicantsPaymentRepository = bmsApplicantsPaymentRepository;
         this.bmsTxRepository = bmsTxRepository;
         this.bmsTxProcessRepository = bmsTxProcessRepository;
+        this.settingRepo = settingRepo;
+        this.bmsInstitutionRepository = bmsInstitutionRepository;
+        this.bmsOfficeRepository = bmsOfficeRepository;
+        this.bmsOfficeServiceRepository = bmsOfficeServiceRepository;
 
 
     }
@@ -160,6 +172,17 @@ public class RetrytableRepo {
     @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
     public int checkNumberTxProcessByUserId(BigDecimal userId){
         return bmsTxProcessRepository.checkNumberTxProcessByUserId(userId);
+    }
+
+
+    /**
+     * find  Setting by Institution Id
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsSetting> getSetting(BigDecimal institutionId) {
+        return settingRepo.findByIsntituion(institutionId);
     }
 
 

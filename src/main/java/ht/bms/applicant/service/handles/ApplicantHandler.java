@@ -7,11 +7,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CalendarHandler {
+public class ApplicantHandler {
 
     private BookingService calendarService;
 
-    public CalendarHandler(BookingService calendarService) {
+    public ApplicantHandler(BookingService calendarService) {
         this.calendarService = calendarService;
     }
 

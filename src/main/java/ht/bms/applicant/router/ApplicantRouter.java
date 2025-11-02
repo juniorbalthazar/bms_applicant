@@ -1,6 +1,6 @@
 package ht.bms.applicant.router;
 
-import ht.bms.applicant.service.handles.CalendarHandler;
+import ht.bms.applicant.service.handles.ApplicantHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.*;
@@ -10,11 +10,11 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 
 @Configuration
-public class CalendarRouter {
+public class ApplicantRouter {
 
-    private final CalendarHandler calendarHandler;
+    private final ApplicantHandler calendarHandler;
 
-    public CalendarRouter(CalendarHandler calendarHandler) {
+    public ApplicantRouter(ApplicantHandler calendarHandler) {
         this.calendarHandler = calendarHandler;
     }
 

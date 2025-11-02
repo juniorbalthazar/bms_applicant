@@ -1,5 +1,7 @@
 package ht.bms.applicant.service.facade;
 
+import ht.bms.applicant.api.ApiAuth;
+import ht.bms.applicant.domain.BmsSetting;
 import ht.bms.applicant.exception.ApplicationException;
 import ht.bms.applicant.domain.repo.RetrytableRepo;
 import ht.bms.applicant.service.mapper.ApplicantMapper;
@@ -11,25 +13,24 @@ import java.math.BigDecimal;
 
 @Transactional
 @Service
-public class BookingService implements BookingFacade{
+public class BookingService {
 
     private RetrytableRepo repo;
     private ApplicantMapper mapper;
+    private ApiAuth auth;
 
 
-    @Override
+
     public int checkActiveNumberTransaction(BigDecimal userId) throws ApplicationException {
         return repo.checkNumberTxProcessByUserId(userId);
     }
 
-    @Override
+
     public boolean checkActiveTransaction(BigDecimal userId) throws ApplicationException {
-        BmsSetting setting=getDefaultSetting() ;
+        BmsSetting setting=repo.getSetting(new BigDecimal(100)).orElseThrow() ;
         int num=checkActiveNumberTransaction(userId);
-        if(setting!=null && setting.getNbreTransPerApplicant()!=null) {
-            if(num>=setting.getNbreTransPerApplicant().intValue()) {
-                return true;
-            }
+        if(setting.getNbreTransPerApplicant()!=null) {
+            return num >= setting.getNbreTransPerApplicant().intValue();
         }
         return false;
     }
