@@ -1,25 +1,37 @@
 package ht.bms.applicant.service.facade;
 
+import ht.bms.applicant.api.AccountBean;
 import ht.bms.applicant.api.ApiAuth;
 import ht.bms.applicant.domain.BmsSetting;
 import ht.bms.applicant.exception.ApplicationException;
 import ht.bms.applicant.domain.repo.RetrytableRepo;
+import ht.bms.applicant.service.handles.ApplicantHandler;
 import ht.bms.applicant.service.mapper.ApplicantMapper;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 
 @Transactional
 @Service
-public class BookingService {
+public class ApplicantService {
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(ApplicantService.class);
 
     private RetrytableRepo repo;
     private ApplicantMapper mapper;
     private ApiAuth auth;
 
+    public ApplicantService(RetrytableRepo repo, ApplicantMapper mapper, ApiAuth auth) {
+        this.repo = repo;
+        this.mapper = mapper;
+        this.auth = auth;
+    }
 
+    public Mono<AccountBean> checkAccount(String token) throws ApplicationException {
+        return auth.isAUth(token);
+    }
 
     public int checkActiveNumberTransaction(BigDecimal userId) throws ApplicationException {
         return repo.checkNumberTxProcessByUserId(userId);
@@ -35,7 +47,6 @@ public class BookingService {
         return false;
     }
 
-    @Override
     public boolean isHaveCitizenParentTransaction(BigDecimal userId) throws ApplicationException {
         return false;
     }
@@ -43,7 +54,7 @@ public class BookingService {
     public Integer isCitizen(String date) {
         return null;
     }
-
+/*
     public Mono<ApplicantMessage> newApplicantForm(BmsPesonnalBean personal, BigDecimal userId) throws ApplicationException {
         return null;
     }
@@ -106,5 +117,5 @@ public class BookingService {
 
     public Mono<ApplicantMessage> addFingerPrint(BigDecimal txId, BigDecimal status, BigDecimal type) throws ApplicationException {
         return null;
-    }
+    }*/
 }

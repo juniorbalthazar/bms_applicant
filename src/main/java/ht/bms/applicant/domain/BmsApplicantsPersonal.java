@@ -21,7 +21,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name="bms_applicants_personnal")
-@NamedQuery(name="BmsApplicantsPesonnal.findAll", query="SELECT b FROM BmsApplicantsPesonnal b")
+@NamedQuery(name="BmsApplicantsPesonnal.findAll", query="SELECT b FROM BmsApplicantsPersonal b")
 public class BmsApplicantsPersonal implements Serializable {
 	private static final long serialVersionUID = 1L;
 

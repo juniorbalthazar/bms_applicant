@@ -22,7 +22,7 @@ public interface BmsApplicantRepository  extends CrudRepository<BmsApplicant,Big
 	public Optional<BmsApplicant> isHaveCitizenParentTransaction(BigDecimal userId);
 
 
-	@Query(value = "SELECT em FROM BmsApplicant em where em.bmsUser.userId=:userID")
+	@Query(value = "SELECT em FROM BmsApplicant em where em.userId=:userID")
 	public List<BmsApplicant> findBmsApplicantByBmsUser(@Param("userID") BigDecimal userID);
 
 }

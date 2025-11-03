@@ -1,6 +1,6 @@
 package ht.bms.applicant.domain.repo;
 
-import ht.gouv.dcpj.bms.domain.BmsTxProcess;
+import ht.bms.applicant.domain.BmsTxProcess;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +13,13 @@ import java.util.Optional;
 public interface BmsTxProcessRepository extends PagingAndSortingRepository<BmsTxProcess,BigDecimal>, JpaSpecificationExecutor<BmsTxProcess> {
 
 
-	@Query("select p from BmsTxProcess p where p.bmsUser.userId = ?1")// 1=Open  2=close   AND p.status=1
+	@Query("select p from BmsTxProcess p where p.userId = ?1")// 1=Open  2=close   AND p.status=1
 	public List<BmsTxProcess> checkActiveTxProcessByUserId(BigDecimal userId);
 
 	@Query("select p from BmsTxProcess p where p.txid = ?1 AND p.status=1")
 	public Optional<BmsTxProcess> findTxProcessByTxId(BigDecimal txId);
 	
-	@Query("select count(p) from BmsTxProcess p where p.bmsUser.userId = ?1 AND p.status=1")
+	@Query("select count(p) from BmsTxProcess p where p.userId = ?1 AND p.status=1")
     public int checkNumberTxProcessByUserId(BigDecimal userId);
 	
 	

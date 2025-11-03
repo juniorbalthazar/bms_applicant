@@ -1,6 +1,7 @@
 package ht.bms.applicant.domain.repo;
 
-import ht.gouv.dcpj.bms.domain.BmsInstitution;
+
+import ht.bms.applicant.domain.BmsInstitution;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

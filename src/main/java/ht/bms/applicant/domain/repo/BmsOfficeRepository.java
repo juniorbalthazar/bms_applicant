@@ -6,7 +6,7 @@
 package ht.bms.applicant.domain.repo;
 
 
-import ht.gouv.dcpj.bms.domain.BmsOffice;
+import ht.bms.applicant.domain.BmsOffice;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

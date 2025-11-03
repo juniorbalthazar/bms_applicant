@@ -1,6 +1,5 @@
 package ht.bms.applicant.domain.repo;
-
-import ht.gouv.dcpj.bms.domain.BmsOfficeService;
+import ht.bms.applicant.domain.BmsOfficeService;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

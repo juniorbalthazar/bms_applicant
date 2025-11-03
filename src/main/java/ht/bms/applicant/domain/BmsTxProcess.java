@@ -47,7 +47,7 @@ public class BmsTxProcess  implements Serializable {
 	private Date endDate;
 
 	@Column(name="user_id")
-	private BigDecimal bmsUser;
+	private BigDecimal userId;
 	
 	@Column(name="status")
 	private BigDecimal status;

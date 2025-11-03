@@ -27,11 +27,11 @@ public interface BmsTxRepository extends CrudRepository<BmsTx,BigDecimal>,Paging
 	public List<BmsTx>findActiveTxByUserId(BigDecimal userId);*/
 	
 	
-	@Query("select t.txId from BmsTx t where t.bmsUser.userId = ?1 AND t.isCurrent=0")
+	@Query("select t.txId from BmsTx t where t.userId = ?1 AND t.isCurrent=0")
 	public BigDecimal checkCurrentTransactionId(BigDecimal userId);
 	
-	@Query("select t.txId from BmsTx t where t.bmsCalendar.dateStr =?1")
-	public Optional<BmsTx> exit(String date);
+/*	@Query("select t.txId from BmsTx t where t.bmsCalendar.dateStr =?1")
+	public Optional<BmsTx> exit(String date);*/
 
 	
 	@Query("select t.txId from BmsTx t  where t.txId = ?1   AND  t.bmsTxStatus.statusId>=1  AND  t.bmsTxType.id>=25 AND   t.isCurrent=0")
@@ -47,14 +47,14 @@ public interface BmsTxRepository extends CrudRepository<BmsTx,BigDecimal>,Paging
 
 	
 	
-	@Query("select count(tx.txId) from BmsTx tx join"
+/*	@Query("select count(tx.txId) from BmsTx tx join"
 			+ " tx.bmsCalendar txCal join"
 			+ " tx.bmsOffice txOffice join"
 			+ " tx.bmsService txService "
 			+ "where txCal.dateStr = ?1 and txOffice.officeId = ?2 and txService.osId = ?3 and tx.bmsTxType.id=26")
 	public int checkNumberTransaction_PAY_For_Office_For_Service_BY_Date(String txDate, BigDecimal officeId,BigDecimal serviceId);
 	
-	
+	*/
 	
 	@Query("update BmsTx b set "
 			+ "b.updatedDate = ?1, "
@@ -72,15 +72,7 @@ public interface BmsTxRepository extends CrudRepository<BmsTx,BigDecimal>,Paging
 	
 	
 	
-	
-/*	@Query("select tx from BmsTx tx join"
-		//	+ " tx.bmsApplicant txA join"
-			+ " tx.bmsApplicant.personnal per join"
-			+ " tx.bmsApplicant.professionnal pro join"
-			+ " tx.bmsApplicant.payment pay "
-			+ "where tx.txCode =?1 OR per.nif =?1 OR per.nin =?1 OR pro.mobilePhone =?1 OR pay.paymentNumber =?1")
-	public Page<BmsTx> filter(String value, Pageable pageable);*/
-	
+
 	
 	@Query("select count(t.txId) from BmsTx t  where  t.bmsTxStatus.statusId >11")
 	public long countAll();

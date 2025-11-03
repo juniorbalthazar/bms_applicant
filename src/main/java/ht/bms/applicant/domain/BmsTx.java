@@ -75,12 +75,12 @@ public class BmsTx implements Serializable {
 	private BigDecimal tx_date;
 
     @Column(name="user_tranction")
-    private BigDecimal user_transaction;
+    private BigDecimal userId;
 
     @Column(name="office_id")
 	private BigDecimal officeId;
 
-    @Column(name="office_id")
+    @Column(name="service_id")
 	private BigDecimal serviceId;
 
     @Column(name="institution_id")

@@ -21,9 +21,8 @@ public class ApplicantRouter {
     @Bean
     public RouterFunction<ServerResponse> calendarRoutes(){
         return RouterFunctions.route()
-                .path("/api/v1/calendar", builder -> builder
-                        .add(baseRoute(RequestPredicates.GET("/getDate")
-                                .and(queryParam("date", t -> true)),calendarHandler::getDate))
+                .path("/api/v1/applicant", builder -> builder
+                        .add(baseRoute(RequestPredicates.GET("/checkAccount"),calendarHandler::checkAccount))
                 )//.onError(exceptionHandler::handleException)
                 .build();
     }
