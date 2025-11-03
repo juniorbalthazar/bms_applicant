@@ -16,23 +16,12 @@ public class ApiAuth {
                 .baseUrl("http://localhost:6290/api/v1/auth").build();
     }
 
-/*    public Mono<AccountBean> isAUth(String token) {
-        return this.client.get().uri(uriBuilder -> uriBuilder.path("/isAuth")
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(AccountBean.class);
-    }*/
-
     public Mono<AccountBean> isAUth(String token) {
         return this.client.post().uri(uriBuilder -> uriBuilder.path("/isAuth")
                         .build())
-                //.headers(httpHeaders -> httpHeaders.setBearerAuth(token))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                //.accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION,  token)
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(AccountBean.class);
     }
-//.mutate().defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-//                .build()
 }
