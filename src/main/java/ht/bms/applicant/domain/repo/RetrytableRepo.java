@@ -72,6 +72,18 @@ public class RetrytableRepo {
     }
 
     /**
+     * save isHaveCitizenParentTransaction
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsApplicant> isHaveCitizenParentTransaction(BigDecimal userId){
+        return applicantRepository.isHaveCitizenParentTransaction( userId);
+    }
+
+    isHaveCitizenParentTransaction
+
+    /**
      * save ApplicantsPersonal
      * @return
      */

@@ -101,28 +101,113 @@ paths:
 
 components:
   schemas:
-    ########################
-    #  API Specs  #
-    ########################
-    Response:
+    ApiResponse:
       type: object
       properties:
         isSuccessfully:
           type: boolean
           example: true
           description: true if operation is successfully otherwise false
-
-    CalendarRequest:
+        errorMessage:
+          type: string
+          example: "Operation completed successfully"
+          description: message of operation
+        errorCode:
+          type: integer
+          example: 0
+          description: error code of operation
+    ApplicantResponse:
       type: object
       properties:
-        year:
+        personalId:
+          type: number
+          description: Personal identifier Id of applicant
+          example: "123456789"
+        professionalId:
+          type: number
+          description: Professional identifier Id of applicant
+          example: "987654321"
+        referencesId:
+          type: array
+          items:
+            type: number
+            description: References identifier Id of applicant
+            example: "111"
+        identityId:
+          type: array
+          items:
+            type: number
+            description: Identity identifier Id of applicant
+            example: "444"
+        bookingDate:
+          $ref: '#/components/schemas/BmsCalendarBean'
+        office:
+          $ref: '#/components/schemas/BmsOfficeBean'
+        success:
+          type: boolean
+          example: true
+        errorCode:
           type: integer
-          description: start year
-          example: 2025
-        numberOfYear:
-          type: integer
-          description: number of year to generate
-          example: 5 {2025-2029}
+          example: 0
+        errorMessage:
+          type: string
+          example: ""
+
+    InstitutionBean:
+      type: object
+      properties:
+        institutionId:
+          type: number
+          description: institution id
+          example: 100
+        email:
+          type: string
+          format: text
+          description: email of institution
+          example : zlab.info@gouv.ht
+        fullName:
+          type: string
+          format: text
+          description: name of institution
+          example : zaria laboratory
+        phone:
+          type: string
+          format: text
+          description: phone of institution
+          example : +509 3701 1234
+        shortName:
+          type: string
+          format: text
+          description: short name of institution
+          example : zlab
+        isDefault:
+          type: number
+          description: 0 is equal to false and 1 is equal to true
+          example : 0
+
+
+    OfficeBean:
+      type: object
+      properties:
+        officeId:
+          type: number
+          description: office id
+          example: 100
+        active:
+          type: number
+          description: 0 is equal to false and 1 is equal to true
+          example : 0
+        isCentral:
+          type: number
+          description: 0 is equal to false and 1 is equal to true
+          example : 1
+        officeName:
+          type: string
+          format: text
+          description: name of office
+          example : head office
+        BmsInstitutionBean:
+          $ref: '#/components/schemas/InstitutionBean'
     CalendarBean:
       type: object
       properties:
@@ -210,7 +295,7 @@ components:
         calendar:
           type: array
           items:
-           $ref: '#/components/schemas/CalendarBean'
+            $ref: '#/components/schemas/CalendarBean'
     DayOfWeekBean:
       type: object
       properties:
@@ -236,129 +321,114 @@ components:
           format: text
           description: Month of year name
           example: January
-
-    InstitutionBean:
+    PersonalBean:
       type: object
       properties:
-        institutionId:
+        applicantId:
           type: number
-          description: institution id
+          description: applicant id
           example: 100
+        alreadyArrestDeport:
+          type: string
+          format: text
+          description: already arrest deport
+          example: oui
+        birthOfPlace:
+          type: string
+          format: text
+          description: place of birth
+          example: Montana
+        dateOfBirth:
+          type: string
+          format: text
+          description: date of birth
+          example: 20-09-1990
+        fatherFullName:
+          type: string
+          format: text
+          description: father full name
+          example: john doe
+        firstName:
+          type: string
+          format: text
+          description: first name
+          example: john
+        isAlreadyArrestDeport:
+          type: string
+          format: text
+          description: is already arrest deport 0= false 1=true
+          example: 0
+        lastName:
+          type: string
+          format: text
+          description: last name
+          example: doe
+        motherFulName:
+          type: string
+          format: text
+          description: mother full name
+          example: jane doe
+        motifDemande:
+          type: string
+          format: text
+          description: Certificate request reason
+          example: BRJ
+        nif:
+          type: string
+          format: text
+          description: numero identification fiscale
+          example: 009-098-098-8
+        nin:
+          type: string
+          format: text
+          description: numero identification national
+          example: 001-2345-6789
         email:
           type: string
           format: text
-          description: email of institution
-          example : zlab.info@gouv.ht
-        fullName:
+          description: email of applicant
+          example: janedoe@gmail.com
+        isCitizen:
           type: string
           format: text
-          description: name of institution
-          example : zaria laboratory
-        phone:
+          description: is citizen 0=false 1=true
+          example: 1
+        msPoids:
           type: string
           format: text
-          description: phone of institution
-          example : +509 3701 1234
-        shortName:
+          description: poids of applicant
+          example: 75kg
+        msTaille:
           type: string
           format: text
-          description: short name of institution
-          example : zlab
-        isDefault:
-          type: number
-          description: 0 is equal to false and 1 is equal to true
-          example : 0
+          description: taille of applicant
+          example: 1.75m
+        conjointFullName:
+          type: string
+          format: text
+          description: Month of year name
+          example: January
+        maritialStatus:
+          type: string
+          format: text
+          description: Month of year name
+          example: January
 
 
-    OfficeBean:
-      type: object
-      properties:
-        officeId:
-          type: number
-          description: office id
-          example: 100
-        active:
-          type: number
-          description: 0 is equal to false and 1 is equal to true
-          example : 0
-        isCentral:
-          type: number
-          description: 0 is equal to false and 1 is equal to true
-          example : 1
-        officeName:
-          type: string
-          format: text
-          description: name of office
-          example : head office
-        BmsInstitutionBean:
-          $ref: '#/components/schemas/InstitutionBean'
-    ServiceBean:
-      type: object
-      properties:
-        serviceId:
-          type: number
-          description: service id
-          example: 100
-        fullName:
-          type: string
-          format: text
-          description: full name of service
-          example: BRJ / Identity
-        isAvailable:
-          type: number
-          description: 0 is equal to false and 1 is equal to true
-          example : 0
-        shortName:
-          type: string
-          format: text
-          description: short name of service
-          example : BRJ
-    SettingBean:
-      type: object
-      properties:
-        settingId:
-          type: number
-          description: Setting id
-          example: 100
-        institutionId:
-          type: number
-          description: office id
-          example: 100
-        nbreTransPerApplicant:
-          type: number
-          description: 0 is equal to false and 1 is equal to true
-          example : 0
-        officeCapacity:
-          type: number
-          description: nomber of office capacity
-          example : 100
-        startHours:
-          type: string
-          format: text
-          description:  start hour of office
-          example : 8:00 AM
-        endHours:
-          type: string
-          format: text
-          description: end hour of office
-          example : 4:00 PM
-        expirationCertificat:
-          type: number
-          description: nomber of days before certificat expiration
-          example : 365
-        sendEmailTransaction:
-          type: number
-          description:  0 is equal to false and 1 is equal to true
-          example : head office
-        maxTimeTxBeforePay:
-          type: number
-          description: max time transaction before pay
-          example : 5
-        smsMesageBody:
-          type: string
-          format: text
-          description: format of sms message
-          example : html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

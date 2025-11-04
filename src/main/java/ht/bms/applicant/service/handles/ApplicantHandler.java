@@ -22,4 +22,12 @@ public class ApplicantHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> checkActiveNumberTransaction(ServerRequest request) {
+        return applicantService.checkActiveNumberTransaction(
+                request.exchange().getRequest().getHeaders().getFirst("Authorization")
+                )
+                .flatMap(ServerResponse.ok()::bodyValue)
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
 }

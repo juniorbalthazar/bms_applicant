@@ -7,7 +7,10 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -26,24 +29,12 @@ public class DateHelper
 
 	public static boolean  checkEarlyDate(Date date) {
 		Date toDayPlus30 = toDatePlus30NextDay();
-		if(date.compareTo(toDayPlus30)<=0) {
-			//if the date is before or equal to today plus 30 days
-			return true;
-		}else {
-			//the date is after today plus 30 days
-			return false;
-		}
+		return date.compareTo(toDayPlus30)<0;
 	}
 
 	public static boolean  checkDayPassDate(Date date) {
 		Date toDay = toDate();
-		if(date.compareTo(toDay)<0) {
-			//if the date is before today
-			return true;
-		}else {
-			//the date is today or after today
-			return false;
-		}
+		return date.compareTo(toDay)<0;
 	}
 
 
@@ -73,5 +64,20 @@ public static Date StringToDate(String date) {
     } catch (ParseException e) {
         throw new IllegalArgumentException("Invalid date format. Expected format: dd-MM-yyyy", e);
     }
-}
+  }
+
+    public  static boolean isMineur(Date from,Date to){
+        return getAge(from, to) <= 17 && getAge(from, to) >= 0;
+    }
+
+    public  static int getAge(Date from,Date to){
+        LocalDate dFrom = from.toInstant().atZone(utc.toZoneId()).toLocalDate();
+        LocalDate dTo = to.toInstant().atZone(utc.toZoneId()).toLocalDate();
+        long daysBetween = ChronoUnit.DAYS.between(dFrom, dTo);
+        return (int) (daysBetween / 365);
+    }
+
+
+
+
 }
