@@ -230,9 +230,9 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/oas3/calendar-oas3-specification.yml</inputSpec>
+							<inputSpec>${project.basedir}/src/main/resources/oas3/applicant-oas3-specification.yml</inputSpec>
 							<generatorName>spring</generatorName>
-							<modelPackage>ht.bms.booking.model</modelPackage>
+							<modelPackage>ht.bms.applicant.model</modelPackage>
 							<generateSupportingFiles>false</generateSupportingFiles>
 							<generateApis>false</generateApis>
 

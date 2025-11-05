@@ -124,4 +124,6 @@ public class BmsApplicantsPersonal implements Serializable {
 	@Column(name="HAIRS")
 	private String hairs;
 
+    @Column(name="isCitizen")
+    private boolean isCitizen;
 }

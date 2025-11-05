@@ -16,23 +16,20 @@ import java.util.Optional;
 @Service
 public class RetrytableRepo {
 
-    private BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository;
-    private BmsApplicantRepository applicantRepository;
+    private final BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository;
+    private final BmsApplicantRepository applicantRepository;
 
-    private BmsApplicantsCertificatRepository applicantsCertificatRepository;
-    private BmsApplicantsFingerprintRepository applicantsFingerprintRepository;
-    private BmsApplicantsIdentityRepository applicantsIdentityRepository;
+    private final BmsApplicantsCertificatRepository applicantsCertificatRepository;
+    private final BmsApplicantsFingerprintRepository applicantsFingerprintRepository;
+    private final BmsApplicantsIdentityRepository applicantsIdentityRepository;
 
-    private BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository;
-    private BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository;
-    private BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository;
-    private  BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository;
-    private BmsTxRepository bmsTxRepository;
-    private BmsTxProcessRepository bmsTxProcessRepository;
-    private SettingRepository settingRepo;
-    private BmsInstitutionRepository bmsInstitutionRepository;
-    private BmsOfficeRepository  bmsOfficeRepository;
-    private BmsOfficeServiceRepository bmsOfficeServiceRepository;
+    private final BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository;
+    private final BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository;
+    private final BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository;
+    private final BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository;
+    private final BmsTxRepository bmsTxRepository;
+    private final BmsTxProcessRepository bmsTxProcessRepository;
+    private final SettingRepository settingRepo;
 
     public RetrytableRepo(BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository, BmsApplicantRepository applicantRepository, BmsApplicantsCertificatRepository applicantsCertificatRepository,
                           BmsApplicantsFingerprintRepository applicantsFingerprintRepository, BmsApplicantsIdentityRepository applicantsIdentityRepository,BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository,
@@ -52,9 +49,6 @@ public class RetrytableRepo {
         this.bmsTxRepository = bmsTxRepository;
         this.bmsTxProcessRepository = bmsTxProcessRepository;
         this.settingRepo = settingRepo;
-        this.bmsInstitutionRepository = bmsInstitutionRepository;
-        this.bmsOfficeRepository = bmsOfficeRepository;
-        this.bmsOfficeServiceRepository = bmsOfficeServiceRepository;
 
 
     }
@@ -72,7 +66,7 @@ public class RetrytableRepo {
     }
 
     /**
-     * save isHaveCitizenParentTransaction
+     * check isHaveCitizenParentTransaction
      * @return
      */
 
@@ -81,7 +75,6 @@ public class RetrytableRepo {
         return applicantRepository.isHaveCitizenParentTransaction( userId);
     }
 
-    isHaveCitizenParentTransaction
 
     /**
      * save ApplicantsPersonal

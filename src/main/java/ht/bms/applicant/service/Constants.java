@@ -2,6 +2,7 @@ package ht.bms.applicant.service;
 
 public class Constants {
 
+    public static final Integer DEFAULT_INSTITUTION_ID = 100;
     public static Integer IS_AVAILABLE = 0;
     public static Integer IS_NOT_AVAILABLE = 1;
     public static String[] HOLIDAY_TYPE= {"FIXED","MOVABLE"};

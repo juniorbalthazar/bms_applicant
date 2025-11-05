@@ -17,17 +17,18 @@ public class ApplicantHandler {
     }
 
     public Mono<ServerResponse> checkAccount(ServerRequest request) {
-        return applicantService.checkAccount(request.exchange().getRequest().getHeaders().getFirst("Authorization"))
+        return Mono.empty();
+/*        applicantService.checkAccount(request.exchange().getRequest().getHeaders().getFirst("Authorization"))
                 .flatMap(ServerResponse.ok()::bodyValue)
-                .switchIfEmpty(ServerResponse.notFound().build());
+                .switchIfEmpty(ServerResponse.notFound().build());*/
     }
 
-    public Mono<ServerResponse> checkActiveNumberTransaction(ServerRequest request) {
+/*    public Mono<ServerResponse> checkActiveNumberTransaction(ServerRequest request) {
         return applicantService.checkActiveNumberTransaction(
                 request.exchange().getRequest().getHeaders().getFirst("Authorization")
                 )
                 .flatMap(ServerResponse.ok()::bodyValue)
                 .switchIfEmpty(ServerResponse.notFound().build());
-    }
+    }*/
 
 }
