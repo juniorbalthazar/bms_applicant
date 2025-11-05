@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ht.bms</groupId>
-	<artifactId>booking</artifactId>
+	<artifactId>applicant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bms_booking</name>
+	<name>bms_applicant</name>
 	<description>this api will expose that take and manage book for an applicant</description>
 
 	<properties>
