@@ -9,8 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -73,9 +73,18 @@ public static Date StringToDate(String date) {
     public  static int getAge(Date from,Date to){
         LocalDate dFrom = from.toInstant().atZone(utc.toZoneId()).toLocalDate();
         LocalDate dTo = to.toInstant().atZone(utc.toZoneId()).toLocalDate();
-        long daysBetween = ChronoUnit.DAYS.between(dFrom, dTo);
+        //long daysBetween = ChronoUnit.DAYS.between(dFrom, dTo);
+		long daysBetween = getDayDiff( Period.between(dFrom, dTo));
         return (int) (daysBetween / 365);
     }
+
+	public static long getDayDiff(Period period) {
+		long years = period.getYears();
+		long months = period.getMonths();
+		long days = period.getDays();
+
+		return (years*365)+(months*30)+days;
+	}
 
 
 

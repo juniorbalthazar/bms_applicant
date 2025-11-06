@@ -1,0 +1,1212 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:6295/calendar'
+    description: Local server
+info:
+  title: applicant
+  version: 1.0.0
+  description: API  that expose all endpoint for Process API
+  contact:
+    name: Lab
+    email: juniorbalthazar@yahoo.fr
+    url: https://github.com/juniorbalthazar/bms_applicant
+  license:
+    name: Appliquart 1.0
+    url: 'https://api.calendar.com/license'
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: regular-users
+    description: Operations available to regular users
+paths:
+  /calendar/register:
+    post:
+      tags:
+        - regular-users
+      summary: save calendar informations.
+      operationId: saveCalender
+      description: post calendar informations
+      requestBody:
+        description: save calendar informations.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarBean'
+        required: true
+      responses:
+        '201': # status code
+          description: A JSON string containing a boolean value if true is successfully ortherwise false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseBean'
+
+
+
+  /calendar/{startDate}/{endDate}:
+    get:
+      tags:
+        - regular-users
+      summary: list of calendar.
+      operationId: calendarBetweenDate
+      description: list of calendar between two dates
+      parameters:
+        - name: startDate
+          in: path
+          description: start date
+          example: 20-09-2025
+          required: true
+          schema:
+            type: Date
+        - name: endDate
+          in: path
+          description: end date
+          example: 25-09-2025
+          required: true
+          schema:
+            type: Date
+      responses:
+        '200': # status code
+          description: A JSON string containing a list of calendar information's
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarResponse'
+
+
+  /calendar/{date}:
+    get:
+      tags:
+        - regular-users
+      summary: list of users account.
+      operationId: usersFilter
+      description: list of users account with pagination and filter
+      parameters:
+        - name: date
+          in: path
+          example: 20-09-2025
+          required: true
+          schema:
+            type: Date
+            format: date
+      responses:
+        '200': # status code
+          description: A JSON string containing a list of calendar information's
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarResponse'
+
+
+
+components:
+  schemas:
+    ApiResponseBean:
+      type: object
+      properties:
+        isSuccessfully:
+          type: boolean
+          example: true
+          description: true if operation is successfully otherwise false
+        errorMessage:
+          type: string
+          example: "Operation completed successfully"
+          description: message of operation
+        errorCode:
+          type: integer
+          example: 0
+          description: error code of operation
+    ApplicantResponse:
+      type: object
+      properties:
+        personalId:
+          type: number
+          description: Personal identifier Id of applicant
+          example: "123456789"
+        professionalId:
+          type: number
+          description: Professional identifier Id of applicant
+          example: "987654321"
+        referencesId:
+          type: array
+          items:
+            type: number
+            description: References identifier Id of applicant
+            example: "111"
+        identityId:
+          type: array
+          items:
+            type: number
+            description: Identity identifier Id of applicant
+            example: "444"
+        bookingDate:
+          $ref: '#/components/schemas/CalendarBean'
+        office:
+          $ref: '#/components/schemas/OfficeBean'
+        success:
+          type: boolean
+          example: true
+        errorCode:
+          type: integer
+          example: 0
+        errorMessage:
+          type: string
+          example: ""
+
+    InstitutionBean:
+      type: object
+      properties:
+        institutionId:
+          type: number
+          description: institution id
+          example: 100
+        email:
+          type: string
+          format: text
+          description: email of institution
+          example : zlab.info@gouv.ht
+        fullName:
+          type: string
+          format: text
+          description: name of institution
+          example : zaria laboratory
+        phone:
+          type: string
+          format: text
+          description: phone of institution
+          example : +509 3701 1234
+        shortName:
+          type: string
+          format: text
+          description: short name of institution
+          example : zlab
+        isDefault:
+          type: boolean
+          description: is institution default
+          example : true
+
+
+    OfficeBean:
+      type: object
+      properties:
+        officeId:
+          type: number
+          description: office id
+          example: 100
+        active:
+          type: boolean
+          description: is office active
+          example : true
+        isCentral:
+          type: boolean
+          description: is office central
+          example : false
+        officeName:
+          type: string
+          format: text
+          description: name of office
+          example : head office
+        BmsInstitutionBean:
+          $ref: '#/components/schemas/InstitutionBean'
+    CalendarBean:
+      type: object
+      properties:
+        calendarDate:
+          type: string
+          format: text
+          description: Date for calendar
+          example: 20-09-2025
+        calendarDateExpired:
+          type: boolean
+          description: true if date is expired otherwise false
+          example: false
+        day_of_month:
+          type: number
+          format: number
+          description: date in long format
+          example: 1734768000000
+        holidayName:
+          type: string
+          format: text
+          description: name of holiday if exist otherwise null
+          example: null
+        holidayNote:
+          type: string
+          format: text
+          description: note of holiday if exist otherwise null
+          example: null
+        isBusinessDay:
+          type: boolean
+          description: is business day
+          example: true
+        isDateAvailable:
+          type: boolean
+          description: is date available
+          example: true
+        isHalfDay:
+          type: boolean
+          description: is half day
+          example: false
+        isHolyDay:
+          type: boolean
+          description: is holy day
+          example: false
+        year:
+          type: number
+          format: number
+          description: year of date
+          example: 1734768000000
+        dayOfWeek:
+          type: number
+          format: number
+          description: day of week
+          example: 1734768000000
+        monthOfYear:
+          type: number
+          format: number
+          description: month of year
+          example: 1734768000000
+        dateStr:
+          type: string
+          format: text
+          description: date in string format
+          example: null
+        dateLong:
+          type: number
+          format: number
+          description: date in long format
+          example: 1734768000000
+        dayOfWeekBean:
+            $ref: '#/components/schemas/DayOfWeekBean'
+        monthOfYearBean:
+          $ref: '#/components/schemas/MonthOfYearBean'
+
+    CalendarResponse:
+      type: object
+      properties:
+        isSuccessfully:
+          type: boolean
+          example: true
+          description: true if operation is successfully otherwise false
+        calendar:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarBean'
+    DayOfWeekBean:
+      type: object
+      properties:
+        dayOfWeekId:
+          type: number
+          description: day of week id
+          example: 2025
+        dayOfWeekName:
+          type: string
+          format: text
+          description: day of week name
+          example: Monday
+
+    MonthOfYearBean:
+      type: object
+      properties:
+        monthOfYearId:
+          type: number
+          description: month of year id
+          example: 100
+        monthOfYearName:
+          type: string
+          format: text
+          description: Month of year name
+          example: January
+    PersonalBean:
+      type: object
+      properties:
+        applicantId:
+          type: number
+          description: applicant id
+          example: 100
+        alreadyArrestDeport:
+          type: string
+          format: text
+          description: already arrest deport
+          example: oui
+        birthOfPlace:
+          type: string
+          format: text
+          description: place of birth
+          example: Montana
+        dateOfBirth:
+          type: string
+          format: text
+          description: date of birth
+          example: 20-09-1990
+        fatherFullName:
+          type: string
+          format: text
+          description: father full name
+          example: john doe
+        firstName:
+          type: string
+          format: text
+          description: first name
+          example: john
+        isAlreadyArrestDeport:
+          type: boolean
+          description: is already arrest deport
+          example: true
+        lastName:
+          type: string
+          format: text
+          description: last name
+          example: doe
+        motherFulName:
+          type: string
+          format: text
+          description: mother full name
+          example: jane doe
+        motifDemande:
+          type: string
+          format: text
+          description: Certificate request reason
+          example: BRJ
+        nif:
+          type: string
+          format: text
+          description: numero identification fiscale
+          example: 009-098-098-8
+        nin:
+          type: string
+          format: text
+          description: numero identification national
+          example: 001-2345-6789
+        email:
+          type: string
+          format: text
+          description: email of applicant
+          example: janedoe@gmail.com
+        isCitizen:
+          type: boolean
+          description: is citizen
+          example: true
+        msPoids:
+          type: string
+          format: text
+          description: poids of applicant
+          example: 75kg
+        msTaille:
+          type: string
+          format: text
+          description: taille of applicant
+          example: 1.75m
+        conjointFullName:
+          type: string
+          format: text
+          description: Month of year name
+          example: January
+        maritialStatus:
+          type: string
+          format: text
+          description: Month of year name
+          example: January
+        gender:
+          type: string
+          format: text
+          description: gender of applicant
+          example: Male
+        idDeptAdress:
+          type: number
+          description: department adress of applicant
+          example: 12
+        idCommuneAdress:
+          type: number
+          description: commune adress of applicant
+          example: 12345
+        detailsAdress:
+          type: string
+          format: text
+          description: detailed adress of applicant
+          example: #12 rue saint louis
+        youngGirlname:
+          type: string
+          format: text
+          description: young girl name
+          example: jane smith
+        nationalite:
+          type: number
+          description: nationality of applicant
+          example: 1
+        passport:
+          type: string
+          format: text
+          description: passport of applicant
+          example: A12345678
+        bodyColor:
+          type: string
+          format: text
+          description: body color of applicant
+          example: black
+        eyes:
+          type: string
+          format: text
+          description: eyes of applicant
+          example: blue
+        hairs:
+          type: string
+          format: text
+          description: hairs of applicant
+          example: black
+
+    ProfessionalBean:
+      type: object
+      properties:
+        applicantId:
+          type: number
+          description: applicant id
+          example: 100
+        conjointFullName:
+          type: string
+          format: text
+          description: conjoint full name
+          example: jane doe
+        maritialStatus:
+          type: string
+          format: text
+          description: maritial status
+          example: married
+        youngGirlname:
+          type: string
+          format: text
+          description: young girl name
+          example: jane smith
+        mobilePhone:
+          type: string
+          format: text
+          description: mobile phone
+          example: +509 3701 1234
+        msPoids:
+          type: string
+          format: text
+          description: poids of applicant
+          example: 75kg
+        msTaille:
+          type: string
+          format: text
+          description: taille of applicant
+          example: 1.75m
+        occupation:
+          type: string
+          format: text
+          description: occupation of applicant
+          example: Engineer
+        profession:
+          type: string
+          format: text
+          description: profession of applicant
+          example: Software Developer
+        streetAddress:
+          type: string
+          format: text
+          description: street address of applicant
+          example: 123 Main St
+        adressGeo:
+          $ref: '#/components/schemas/GeoBean'
+    GeoBean:
+      type: object
+      properties:
+        departementId:
+          type: number
+          description: applicant id
+          example: 100
+        nameDepartement:
+          type: string
+          format: text
+          description: name of departement
+          example: Ouest
+        communesId:
+          type: number
+          description: communes id
+          example: 100
+        nameCommunes:
+          type: string
+          format: text
+          description: name of communes
+          example: Port-au-Prince
+    ReferenceRequest:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceBean'
+    ReferenceBean:
+      type: object
+      properties:
+        applicantId:
+          type: number
+          description: applicant id
+          example: 100
+        referencesId:
+          type: number
+          description:  references id
+          example: 100
+        firstName:
+          type: string
+          format: text
+          description: first name of reference
+          example: jane
+        lastName:
+          type: string
+          format: text
+          description: last name of reference
+          example: peter
+        nin:
+          type: string
+          format: text
+          description: nin
+          example: 001-2345-6789
+        phone:
+          type: string
+          format: text
+          description: phone of reference
+          example: +509 3701 1234
+        email:
+          type: string
+          format: text
+          description: email of reference
+          example: peterjane@gmail.com
+        streetAddres:
+          type: string
+          format: text
+          description: street address of reference
+          example: 123 Main St
+
+
+    SubmitBean:
+      type: object
+      properties:
+        txId:
+          type: number
+          description: transaction id
+          example: 100
+        userId:
+          type: number
+          description:  user id
+          example: 100
+        issign:
+          type: boolean
+          description:  sign id
+          example: true
+        photo:
+          type: string
+          description:  picture of applicant
+          example: 100
+        contentType:
+          type: number
+          description:  type of picture
+          example: JPEG
+    PaymentRequest:
+      type: object
+      properties:
+        applicantId:
+          type: number
+          description: applicant id
+          example: 100
+        paymentNumber:
+          type: string
+          description: payment number
+          example: 100
+        bookingDate:
+          type: string
+          description:  booking date
+          example: 20-09-2025
+    BasicRequest:
+      type: object
+      properties:
+        txId:
+          type: number
+          description: transaction id
+          example: 100
+        userId:
+          type: number
+          description: user id
+          example: 100
+        dataSize:
+          type: number
+          description: size of data
+          example: 100
+        status:
+          type: number
+          description: status of demand
+          example: 100
+        type:
+          type: number
+          description: type of demand
+          example: 100
+        date:
+          type: string
+          format: text
+          description: date of demand
+          example: 20-09-2025
+        officeId:
+          type: number
+          description: office id
+          example: 100
+        serviceId:
+          type: number
+          description: service id
+          example: 100
+    TxSearCriteria:
+      type: object
+      properties:
+        txId:
+          type: number
+          description: transaction id
+          example: 100
+        txDate:
+          type: string
+          description: transaction date
+          example: 20-09-2025
+        phone:
+          type: string
+          description: phone number
+          example: +509 3701 1234
+        nin:
+          type: string
+          description: national identification number
+          example: 001-2345-6789
+        nif:
+          type: string
+          description: fiscal identification number
+          example: 009-098-098-8
+        status:
+          type: number
+          description: status of transaction
+          example: 100
+        type:
+          type: number
+          description: type of transaction
+          example: 100
+        office_id:
+          type: number
+          description: office id
+          example: 100
+        user_id:
+          type: number
+          description: user id
+          example: 100
+        userAssignId:
+          type: number
+          description: user assign id
+          example: 100
+        paymentNumber:
+          type: number
+          description: payment number
+          example: 100
+        startDate:
+          type: string
+          description:  start date of transaction
+          example: 20-09-2025
+        endDate:
+          type: string
+          description: end date of transaction
+          example: 20-09-2025
+        iscertificat:
+          type: boolean
+          description:  is certificat is ready
+          example: false
+        isdemande:
+          type: boolean
+          description:  is demande is ready
+          example: true
+        isdemandeSubmitted:
+          type: boolean
+          description: is demande submitted
+          example: false
+        isdemandeNotComplete:
+          type: boolean
+          description: is demande not complete
+          example: true
+        attribution:
+          type: number
+          description: transaction id
+          example: 100
+    RoleBean:
+      type: object
+      properties:
+        roleId:
+          type: number
+          description: role id
+          example: 100
+        roleName:
+          type: string
+          description: role name
+          example: Admin
+    UserBean:
+      type: object
+      properties:
+        userId:
+          type: number
+          description: user id
+          example: 100
+        firstName:
+          type: string
+          description: first name
+          example: john
+        gender:
+          type: string
+          description: gender of user
+          example: Male
+        lastName:
+          type: string
+          description: last name
+          example: doe
+        middleName:
+          type: string
+          description: middle name
+          example: alan
+        photo:
+          type: string
+          description: photo of user in base64
+          example: /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
+        phone:
+          type: string
+          description: phone number
+          example: +509 3701 1234
+        email:
+          type: string
+          description: email of user
+          example: admin@gouv.ht
+        nin:
+          type: string
+          description: national identification number
+          example: 001-2345-6789
+        nif:
+          type: string
+          description: fiscal identification number
+          example: 009-098-098-8
+        passport:
+          type: string
+          description: passport number
+          example: A12345678
+        nationalite:
+          type: string
+          description: nationality of user
+          example: Haitian
+        role:
+          type: string
+          description: role of user
+          example: Admin
+        office:
+          $ref: '#/components/schemas/OfficeBean'
+        institution:
+          $ref: '#/components/schemas/InstitutionBean'
+    AccountBean:
+      type: object
+      properties:
+        accountId:
+          type: number
+          description: role id
+          example: 100
+        assignId:
+          type: number
+          description: role id
+          example: 100
+        email:
+          type: string
+          format: text
+          description: email of user
+          example: admin@#gouv.ht
+        tel:
+          type: string
+          format: text
+          description: phone number of user
+          example: +509 3701 1234
+        enabled:
+          type: number
+          description: is account enabled 0=false 1=true
+          example: 1
+        role:
+          $ref: '#/components/schemas/RoleBean'
+        user:
+          $ref: '#/components/schemas/UserBean'
+    RegisterRequest:
+      type: object
+      properties:
+        userId:
+          type: number
+          description: user id
+          example: 100
+        username:
+          type: string
+          description: username
+          example: johndoe
+        password:
+          type: string
+          description: password
+          example: password123
+        firstName:
+          type: string
+          description: first name
+          example: john
+        gender:
+          type: string
+          description: gender of user
+          example: Male
+        lastName:
+          type: string
+          description: last name
+          example: doe
+        phone:
+          type: string
+          description: phone number
+          example: +509 3701 1234
+        email:
+          type: string
+          description: email of user
+          example: admin@gouv.ht
+        nin:
+          type: string
+          description: national identification number
+          example: 001-2345-6789
+        nif:
+          type: string
+          description: fiscal identification number
+          example: 009-098-098-8
+        accountId:
+          type: number
+          description: account id
+          example: 100
+        officeId:
+          type: number
+          description: office id
+          example: 100
+        passport:
+          type: string
+          description: passport number
+          example: A12345678
+        nationalite:
+          type: string
+          description: nationality of user
+          example: Haitian
+        picture:
+          type: string
+          description: photo of user in base64
+          example: /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
+        pictureType:
+          type: string
+          description: nationality of user
+          example: Haitian
+        role:
+          $ref: '#/components/schemas/RoleBean'
+    ProcessRequest:
+      type: object
+      properties:
+        txId:
+          type: number
+          description: transaction id
+          example: 100
+        userId:
+          type: number
+          description: user id
+          example: 100
+        assignId:
+          type: number
+          description: assign id
+          example: 100
+        digitalNumber:
+          type: string
+          description: digital number
+          example: DN123456789
+        pinNumber:
+          type: string
+          description: pin number
+          example: PIN987654321
+        initial:
+          type: string
+          description: initial
+          example: JD
+        comment:
+          type: string
+          description: comment
+          example: This is a sample comment.
+        raison:
+          type: string
+          description: raison
+          example: Sample raison.
+    AssignRequest:
+      type: object
+      properties:
+        institutionId:
+          type: number
+          description: institution id
+          example: 100
+        userId:
+          type: number
+          description: user id
+          example: 100
+        assignId:
+          type: number
+          description: assign id
+          example: 100
+        initial:
+          type: string
+          description: initial
+          example: JD
+        document:
+          type: string
+          description: document in byte array
+          example: /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
+        documentType:
+          type: string
+          description: document type
+          example: PDF
+        fullName:
+          type: string
+          description: full name
+          example: john doe
+        assignName:
+          type: string
+          description: assign name
+          example: john doe
+        pinNumber:
+          type: string
+          description: pin number
+          example: PIN987654321
+        pinNumberConfirm:
+          type: string
+          description: pin number confirm
+          example: PIN987654321
+        poste:
+          type: string
+          description: poste of assign
+          example: Manager
+        responsabilite:
+          type: string
+          description: responsabilite of assign
+          example: Admin
+
+    ApplicantTableResponse:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicantTable'
+        isSuccessfully:
+          type: boolean
+          example: true
+          description: true if operation is successfully otherwise false
+        errorMessage:
+          type: string
+          example: "Operation completed successfully"
+          description: message of operation
+        errorCode:
+          type: integer
+          example: 0
+          description: error code of operation
+
+    ApplicantTable:
+      type: object
+      properties:
+        currentTxId:
+          type: number
+          description: transaction id
+          example: 100
+        stateId:
+          type: number
+          description:  state id
+          example: 100
+        office:
+          type: string
+          format: text
+          description: name of office
+          example: head office
+        service:
+          type: string
+          format: text
+          description: name of service
+          example: service de l'etat civil
+        bookingDate:
+          type: string
+          format: text
+          description: booking date
+          example: 20-09-2025
+        bookingNumber:
+          type: string
+          format: text
+          description: booking number
+          example: BN123456
+        paymentNumber:
+          type: string
+          format: text
+          description: payment number
+          example: PN654321
+        status:
+          type: string
+          format: text
+          description: status of applicant
+          example: Pending
+        state:
+          type: string
+          format: text
+          description: state of applicant
+          example: New
+        fullName:
+          type: string
+          format: text
+          description: full name of applicant
+          example: john doe
+        isCitizen:
+          type: boolean
+          description: is citizen
+          example: true
+        document:
+          type: string
+          format: text
+          description: document of applicant
+          example: /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
+        txCodeCrypt:
+          type: string
+          format: text
+          description: transaction code crypted
+          example: abcd1234efgh5678
+    PaymentResponse:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarBean'
+        currentTxId:
+          type: number
+          example: 100
+          description: transaction id
+        bookingDate:
+          $ref: '#/components/schemas/CalendarBean'
+        office:
+          $ref: '#/components/schemas/OfficeBean'
+        service:
+          $ref: '#/components/schemas/ServiceBean'
+
+    IdentityBean:
+      type: object
+      properties:
+        identityId:
+          type: number
+          description: identity id
+          example: 100
+        docCentent:
+          type: string
+          description: document in byte array
+          example: /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
+        contentType:
+          type: string
+          format: text
+          description: type of document
+          example : PDF
+        name:
+            type: string
+            format: text
+            description: name of document
+            example : Birth Certificate
+    ServiceBean:
+      type: object
+      properties:
+        osId:
+          type: number
+          description: service id
+          example: 100
+        isServiceAvailable:
+          type: boolean
+          description: is service available
+          example : true
+        serviceFullName:
+          type: string
+          format: text
+          description: full name of service
+          example : Service de l'Etat Civil
+        serviceShortName:
+          type: string
+          format: text
+          description: short name of service
+          example : SEC
+
+
+  ##  Problem:
+  ##    $ref: 'problem-schema.yaml#/components/schemas/Problem'
+    Problem:
+      description: Describes the probblem in case of error.
+      type: object
+      title: Problem
+      required:
+        - Title
+      properties:
+        Title:
+          type: string
+          description: >-
+            A short, human-readable summary of the problem type.
+            it SHOULD not change from occurence to occurence of the problem. See [RFC7231], Section 3.4
+        Detail:
+          type: string
+          description:
+            A human-readable explanation specific to this occurence of the problem
+        ValidationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+        BusinessErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessError'
+        TechnicalErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechnicalError'
+
+    ValidationError:
+      type: object
+      description: Validation of payload, url parameters  and request parameter to the specification of the OpenAPI contract
+      required:
+        - AttributeName
+        - Reason
+      properties:
+        AttributeName:
+          type: string
+          description: Name of the element in the payload, request parameter, URI parameter or header parameter
+        Reason:
+          type: string
+          description: A short human-readable summary of the reason.
+        Message:
+          type: string
+          description: A short human-readable summary of the message
+
+    BusinessError:
+      type: object
+      description: Validation of the business rules of the request. Happens after validation of the OpenAPI contract.
+      required:
+        - Code
+      properties:
+        Code:
+          type: string
+          description: An ISO  standard [https://www.iso20022.org/]
+        Reason:
+          type: string
+          description: A short human-readable summary of the reason.
+        Message:
+          type: string
+          description: A short human-readable summary of the message
+
+    TechnicalError:
+      type: object
+      description: This type of error occurs during an irrecoverable technical problem.
+      required:
+        - Code
+      properties:
+        Code:
+          type: string
+          description: An ISO  standard [https://www.iso20022.org/]
+        Reason:
+          type: string
+          description: A short human-readable summary of the reason.
+        Message:
+          type: string
+          description: A short human-readable summary of the message

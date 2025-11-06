@@ -70,21 +70,31 @@ public class BmsTx implements Serializable {
 	
 	private BigDecimal updatedBy;
 
-	private BigDecimal applicant_id;
+	//bi-directional many-to-one association to BmsApplicant
+	@ManyToOne
+	@JoinColumn(name="applicant_id")
+	private BmsApplicant bmsApplicant;
 
-	private BigDecimal tx_date;
+	//bi-directional many-to-one association to BmsCalendar
+	@ManyToOne//(cascade = CascadeType.ALL)
+	@JoinColumn(name="tx_date")
+	private BmsCalendar bmsCalendar;
 
-    @Column(name="user_tranction")
-    private BigDecimal userId;
+	@ManyToOne
+	@JoinColumn(name="user_tranction")
+	private BmsUser bmsUser;
 
-    @Column(name="office_id")
-	private BigDecimal officeId;
+	@ManyToOne
+	@JoinColumn(name="office_id")
+	private BmsOffice bmsOffice;
 
-    @Column(name="service_id")
-	private BigDecimal serviceId;
+	@ManyToOne
+	@JoinColumn(name="service_id")
+	private BmsService bmsService;
 
-    @Column(name="institution_id")
-    private BigDecimal institutionId;
+	@ManyToOne
+	@JoinColumn(name="institution_id")
+	private BmsInstitution bmsInstitution;
 
 	//bi-directional many-to-one association to BmsTxStatus
 	@ManyToOne

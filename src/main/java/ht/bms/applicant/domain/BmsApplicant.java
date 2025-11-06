@@ -37,7 +37,7 @@ public class BmsApplicant implements Serializable {
 
 
 	@Column(name="is_citizen")
-	private String isCitizen;
+	private boolean isCitizen;
 
 	@Column(name="nationalite")
 	private BigDecimal nationalite;

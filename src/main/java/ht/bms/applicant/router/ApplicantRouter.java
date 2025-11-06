@@ -22,8 +22,9 @@ public class ApplicantRouter {
     public RouterFunction<ServerResponse> calendarRoutes(){
         return RouterFunctions.route()
                 .path("/api/v1/applicant", builder -> builder
-                        .add(baseRoute(RequestPredicates.GET("/checkAccount"),calendarHandler::checkAccount))
-                )//.onError(exceptionHandler::handleException)
+                        .add(baseRoute(RequestPredicates.POST("/newApplicant"),calendarHandler::newApplicant))
+                )
+                //.onError(exceptionHandler::handleException)
                 .build();
     }
 

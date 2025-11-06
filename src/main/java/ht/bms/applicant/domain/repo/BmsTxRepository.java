@@ -27,7 +27,7 @@ public interface BmsTxRepository extends CrudRepository<BmsTx,BigDecimal>,Paging
 	public List<BmsTx>findActiveTxByUserId(BigDecimal userId);*/
 	
 	
-	@Query("select t.txId from BmsTx t where t.userId = ?1 AND t.isCurrent=0")
+	@Query("select t.txId from BmsTx t where t.bmsUser.userId = ?1 AND t.isCurrent=0")
 	public BigDecimal checkCurrentTransactionId(BigDecimal userId);
 	
 /*	@Query("select t.txId from BmsTx t where t.bmsCalendar.dateStr =?1")

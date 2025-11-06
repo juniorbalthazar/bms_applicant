@@ -6,10 +6,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -30,12 +28,22 @@ public class RetrytableRepo {
     private final BmsTxRepository bmsTxRepository;
     private final BmsTxProcessRepository bmsTxProcessRepository;
     private final SettingRepository settingRepo;
+    private final BmsAccountsRepository bmsAccountsRepository;
+    private final BmsRolesRepository bmsRolesRepository;
+    private final BmsUsersRepository bmsUsersRepository;
+    private final BmsCogeGenRepository bmsCogeGenRepository;
+    private final BmsOfficeRepository  bmsOfficeRepository;
+    private final BmsInstitutionRepository bmsInstitutionRepository;
+    private final BmsOfficeServiceRepository bmsOfficeServiceRepository;
+    private final BmsCalendarRepository calendarRepo;
+
+
 
     public RetrytableRepo(BmsApplicantDemandeMotifRepository applicantDemandeMotifRepository, BmsApplicantRepository applicantRepository, BmsApplicantsCertificatRepository applicantsCertificatRepository,
-                          BmsApplicantsFingerprintRepository applicantsFingerprintRepository, BmsApplicantsIdentityRepository applicantsIdentityRepository,BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository,
-                          BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository, BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository,BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository,
-                          BmsTxRepository bmsTxRepository,BmsTxProcessRepository bmsTxProcessRepository,SettingRepository settingRepo,BmsInstitutionRepository bmsInstitutionRepository,BmsOfficeRepository  bmsOfficeRepository,
-                          BmsOfficeServiceRepository bmsOfficeServiceRepository){
+                          BmsApplicantsFingerprintRepository applicantsFingerprintRepository, BmsApplicantsIdentityRepository applicantsIdentityRepository, BmsApplicantsPaymentRepository bmsApplicantsPaymentRepository,
+                          BmsApplicantsPesonnalRepository bmsApplicantsPesonnalRepository, BmsApplicantsProfessionalRepository bmsApplicantsProfessionalRepository, BmsApplicantsReferenceRepository bmsApplicantsReferenceRepository,
+                          BmsTxRepository bmsTxRepository, BmsTxProcessRepository bmsTxProcessRepository, SettingRepository settingRepo, BmsInstitutionRepository bmsInstitutionRepository, BmsOfficeRepository  bmsOfficeRepository,
+                          BmsOfficeServiceRepository bmsOfficeServiceRepository, BmsAccountsRepository bmsAccountsRepository, BmsRolesRepository bmsRolesRepository, BmsUsersRepository bmsUsersRepository, BmsCogeGenRepository bmsCogeGenRepository, BmsOfficeRepository bmsOfficeRepository1, BmsInstitutionRepository bmsInstitutionRepository1, BmsOfficeServiceRepository bmsOfficeServiceRepository1, BmsCalendarRepository calendarRepo){
 
         this.applicantDemandeMotifRepository = applicantDemandeMotifRepository;
         this.applicantRepository = applicantRepository;
@@ -49,8 +57,14 @@ public class RetrytableRepo {
         this.bmsTxRepository = bmsTxRepository;
         this.bmsTxProcessRepository = bmsTxProcessRepository;
         this.settingRepo = settingRepo;
-
-
+        this.bmsAccountsRepository = bmsAccountsRepository;
+        this.bmsRolesRepository = bmsRolesRepository;
+        this.bmsUsersRepository = bmsUsersRepository;
+        this.bmsCogeGenRepository = bmsCogeGenRepository;
+        this.bmsOfficeRepository = bmsOfficeRepository1;
+        this.bmsInstitutionRepository = bmsInstitutionRepository1;
+        this.bmsOfficeServiceRepository = bmsOfficeServiceRepository1;
+        this.calendarRepo = calendarRepo;
     }
 
 
@@ -191,4 +205,107 @@ public class RetrytableRepo {
     }
 
 
+    /**
+     * find  Account by User Id
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsAccount> findBmsAccountByUserId(BigDecimal userId) {
+        return bmsAccountsRepository.findBmsAccountByUserId(userId);
+    }
+
+
+    /**
+     * checkCurrentTransactionId
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public BigDecimal checkCurrentTransactionId(BigDecimal userId) {
+        return bmsTxRepository.checkCurrentTransactionId(userId);
+    }
+
+
+
+    /**
+     * checkFormIsSubmitAndSign
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public BigDecimal checkFormIsSubmitAndSign(BigDecimal currentTxId) {
+        return bmsTxRepository.checkFormIsSubmitAndSign(currentTxId);
+    }
+
+    /**
+     * existsByCode
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsCodegen> existsByCode(String code) {
+        return bmsCogeGenRepository.findById(code);
+    }
+
+    /**
+     * save CodeGen
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public BmsCodegen save(BmsCodegen codeGen) {
+        return bmsCogeGenRepository.save(codeGen);
+    }
+
+    /**
+     * get OfficeCentral
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsOffice> getBmsOfficeCentral(BigDecimal bigDecimal, BigDecimal institutionId) {
+        return bmsOfficeRepository.getBmsOfficeCentral(bigDecimal, institutionId);
+    }
+
+    /**
+     * get OfficeCentral
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsInstitution> getInstitutionById(BigDecimal institutionId) {
+        return bmsInstitutionRepository.findById(institutionId);
+    }
+
+    /**
+     * get OfficeService By OfficeId
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public Optional<BmsOfficeService> findBmsOfficeServiceByOfficeId(BigDecimal officeId) {
+        return bmsOfficeServiceRepository.findBmsOfficeServiceByOfficeId(officeId);
+    }
+
+    /**
+     * save
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+    public BmsTxProcess saveTxProcess(BmsTxProcess process) {
+        return bmsTxProcessRepository.save(process);
+    }
+
+    /**
+     * find OfficeService By OfficeId
+     * @return
+     */
+
+    @Retryable(retryFor = SQLException.class, maxAttemptsExpression = "#{${retry-database.max-attempts}}", backoff = @Backoff(delayExpression = "#{${retry-database.backoff}}"))
+
+    public Optional<BmsApplicantsPersonal> findPersonalById(BigDecimal personalId) {
+        return bmsApplicantsPesonnalRepository.findById(personalId);
+    }
 }

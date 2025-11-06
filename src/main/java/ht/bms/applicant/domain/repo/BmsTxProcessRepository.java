@@ -1,25 +1,27 @@
 package ht.bms.applicant.domain.repo;
 
+import ht.bms.applicant.domain.BmsAccount;
 import ht.bms.applicant.domain.BmsTxProcess;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public interface BmsTxProcessRepository extends PagingAndSortingRepository<BmsTxProcess,BigDecimal>, JpaSpecificationExecutor<BmsTxProcess> {
+public interface BmsTxProcessRepository extends CrudRepository<BmsTxProcess, BigDecimal>,PagingAndSortingRepository<BmsTxProcess,BigDecimal>, JpaSpecificationExecutor<BmsTxProcess> {
 
 
-	@Query("select p from BmsTxProcess p where p.userId = ?1")// 1=Open  2=close   AND p.status=1
+	@Query("select p from BmsTxProcess p where p.bmsUser.userId = ?1")// 1=Open  2=close   AND p.status=1
 	public List<BmsTxProcess> checkActiveTxProcessByUserId(BigDecimal userId);
 
 	@Query("select p from BmsTxProcess p where p.txid = ?1 AND p.status=1")
 	public Optional<BmsTxProcess> findTxProcessByTxId(BigDecimal txId);
 	
-	@Query("select count(p) from BmsTxProcess p where p.userId = ?1 AND p.status=1")
+	@Query("select count(p) from BmsTxProcess p where p.bmsUser.userId = ?1 AND p.status=1")
     public int checkNumberTxProcessByUserId(BigDecimal userId);
 	
 	
@@ -37,6 +39,6 @@ public interface BmsTxProcessRepository extends PagingAndSortingRepository<BmsTx
 			+ "inner join bms_tx tx on tx.tx_id=a.applicant_id "
 			+ "inner join BmsTxProcess p on p.tx_id=a.applicant_id "
 			+ "where tx.user_tranction =:userId and a.is_citizen=true and tx.is_current=0", nativeQuery = true)
-	public Optional<BmsApplicant> isHaveCitizenParentTransaction(BigDecimal userId);*/
-	
+	public Optional<BmsApplicant> isHaveCitizenParentTransaction(BigDecimal userId);
+	*/
 }

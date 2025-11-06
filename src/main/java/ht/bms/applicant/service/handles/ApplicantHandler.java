@@ -1,6 +1,9 @@
 package ht.bms.applicant.service.handles;
 
+import ht.bms.applicant.model.ApplicantResponse;
+import ht.bms.applicant.model.PersonalBean;
 import ht.bms.applicant.service.facade.ApplicantService;
+import ht.bms.applicant.service.validator.RequestValidator;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -16,19 +19,12 @@ public class ApplicantHandler {
         this.applicantService = applicantService;
     }
 
-    public Mono<ServerResponse> checkAccount(ServerRequest request) {
-        return Mono.empty();
-/*        applicantService.checkAccount(request.exchange().getRequest().getHeaders().getFirst("Authorization"))
-                .flatMap(ServerResponse.ok()::bodyValue)
-                .switchIfEmpty(ServerResponse.notFound().build());*/
+    public Mono<ServerResponse> newApplicant(ServerRequest request) {
+        var token = request.exchange().getRequest().getHeaders().getFirst("Authorization");
+        return request.bodyToMono(PersonalBean.class)
+                .transform(RequestValidator.validatePersonal())
+                .as(app->applicantService.addApplicantForm(app,token))
+                .flatMap(ServerResponse.ok()::bodyValue);
     }
-
-/*    public Mono<ServerResponse> checkActiveNumberTransaction(ServerRequest request) {
-        return applicantService.checkActiveNumberTransaction(
-                request.exchange().getRequest().getHeaders().getFirst("Authorization")
-                )
-                .flatMap(ServerResponse.ok()::bodyValue)
-                .switchIfEmpty(ServerResponse.notFound().build());
-    }*/
 
 }

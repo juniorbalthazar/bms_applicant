@@ -11,6 +11,7 @@ import ht.bms.applicant.service.Constants;
 import ht.bms.applicant.service.handles.ApplicantHandler;
 import ht.bms.applicant.service.mapper.ApplicantMapper;
 import ht.bms.applicant.utils.DateHelper;
+import ht.bms.applicant.utils.GenTools;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,227 +61,186 @@ public class ApplicantService {
                         //exit.filter(a -> StringUtils.isNoneBlank(a.getIsCitizen()) && a.getIsCitizen().equals("0")).isPresent();
     }
 
-    public Integer isCitizen(String date) {
-        if (StringUtils.isNoneBlank(date)) {
+    public boolean isCitizen(String date) {
             return DateHelper.isMineur(DateHelper.StringToDate(date), DateHelper.toDate())
                     ? Constants.TYPE_MINEUR
                     : Constants.TYPE_CITIZEN;
-        }
-        return 0;
-
     }
 
 
 
 
-    public Mono<ApplicantResponse> newApplicantForm(Mono<PersonalBean> request, String token) throws ApplicationException {
-        ApplicantResponse message=new ApplicantResponse();
-        message.setSuccess(false);
-        var auth=checkAccount(token);
-        return request//.map(mapper::toPersonal)
-                .flatMap(personal->{
-                    ApplicantResponse response = new ApplicantResponse();
-                    response.setSuccess(false);
+    public Mono<ApplicantResponse> addApplicantForm(Mono<PersonalBean> request, String access) throws ApplicationException {
+        ApplicantResponse response = new ApplicantResponse();
+        response.setSuccess(false);
+        var auth=checkAccount(access);
+        return request.flatMap(personal->{
+
+
+                    if (Optional.ofNullable(auth).isEmpty())
+                        throw new ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ UserId session  }} not exits") ;
+
                     BigDecimal userId=auth.getUserId();
-                    //Optional<BmsAccount> account=Optional.ofNullable(null);
-                    // if(personal.getIsCitizen()!=null) {//
+                    Optional<BmsAccount> account=repo.findBmsAccountByUserId(userId);
+                    BigDecimal currentTxId=repo.checkCurrentTransactionId(userId);
+                    if(Objects.equals(this.isCitizen(personal.getDateOfBirth()), Constants.TYPE_MINEUR)) {
+                        if(isHaveCitizenParentTransaction(userId)==false) throw new  ApplicationException("Une demande pour un adulte est en cours , completer la d'abord") ;
+                    }
+                    if (Optional.ofNullable(repo.checkFormIsSubmitAndSign(currentTxId)).isPresent())
+                       throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ Form is Already Submit and Sign  }}  ");
 
-                        Optional<BmsAccount> account=repo.getAccountsRepository().findBmsAccountByUserId(userId);
+                        boolean isUserHaveMaxTransaction=isUserHaveMaxTransaction(userId);
 
-                        if(account.isPresent()) {
-                            BigDecimal currentTxId=repo.getTxRepository().checkCurrentTransactionId(userId);
-                            BigDecimal isSign=repo.getTxRepository().checkFormIsSubmitAndSign(currentTxId);
+                        BmsApplicant applicant=null;
+                        BigDecimal codeId=null;
+                        BmsCodegen codeGen=new BmsCodegen();
+                        BmsApplicantsPersonal entitySaved=null;
+                        BmsApplicantsPersonal entity=mapper.toPersonal(personal);
 
+                        if(isUserHaveMaxTransaction==true)
+                            throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  User has max number active transaction") ;
 
-                            if(Objects.equals(this.isCitizen(personal.getDateOfBirth()), Constants.TYPE_CITIZEN)) {
-                                if(personal.getApplicantId()==null) {
-                                    boolean haveTransaction=isHaveCitizenParentTransaction(userId);
-                                    if(haveTransaction) throw new ApplicationException("Une demande pour un adulte est en cours , completer la d'abord") ;
-                                }
-                            }
-                            else if(Objects.equals(this.isCitizen(personal.getDateOfBirth()), Constants.TYPE_MINEUR)) {
-                                throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ IsCitizen value must be 1=Adult or 2=Mineur }}  ") ;
-                            }
+                        if(personal.getApplicantId()==null) {
 
+                                do {codeId= GenTools.generedCodeId();}while(repo.existsByCode(codeId.toString()).isPresent());
+                                codeGen.setCode(codeId.toString());
+                                codeGen.setCreateddate(DateHelper.toDate());
+                                codeGen=repo.save(codeGen);
+                                entity.setApplicantId(codeId);
 
-                            if(isSign==null) {
+                                entity.setCreatedDate(DateHelper.toDate());
+                                entitySaved=repo.savePersonal(entity);
+                                if(entitySaved!=null) {
 
-                                boolean isUserHaveMaxTransaction=isUserHaveMaxTransaction(userId);
-
-
-                                BmsApplicant applicant=null;
-                                BigDecimal codeId=null;//GenTools.generedCodeId();
-                                BmsCodegen codeGen=new BmsCodegen();
-                                BmsApplicantsPersonal entitySaved=null;
-                                BmsApplicantsPersonal entity=mapper.mapToEntity(personal);
-
-
-
-
-
-                                if(personal.getApplicantId()==null) {
-
-                                    if(isUserHaveMaxTransaction==false) {
-
-                                        do {codeId=GenTools.generedCodeId();}while(repo.getCodegenRepository().existsByCode(codeId.toString()));
-                                        codeGen.setCode(codeId.toString());
-                                        codeGen.setCreateddate(DateHelper.toDate());
-                                        codeGen=repo.getCodegenRepository().save(codeGen);
-                                        entity.setApplicantId(codeId);
-
-                                        entity.setCreatedDate(DateHelper.toDate());
-                                        entitySaved=repo.getApplicantsPesonnalRepository().save(entity);
+                                    applicant=new BmsApplicant();
+                                    BmsUser bmsUser=new BmsUser();
+                                    bmsUser.setUserId(userId);
+                                    applicant.setUserId(userId);
+                                    if(entity.getNationalite()==null) {
+                                        if(account.get().getBmsUser()!=null && account.get().getBmsUser().getNationalite()!=null) {
+                                            applicant.setNationalite(account.get().getBmsUser().getNationalite());
+                                        }
 
 
+                                    }else {
+                                        applicant.setNationalite(entity.getNationalite());
+                                    }
+
+                                    applicant.setApplicantId(codeId);
+                                    applicant.setCreatedDate(DateHelper.toDate());
+                                    applicant.setPersonal(entitySaved);
 
 
-                                        if(entitySaved!=null) {
+                                    if(personal.getIsCitizen()==Constants.TYPE_CITIZEN) {
+                                        applicant.setCitizen(Constants.TYPE_CITIZEN);
+                                    }
+                                    else if(personal.getIsCitizen()==Constants.TYPE_MINEUR) {
+                                        applicant.setCitizen(Constants.TYPE_MINEUR);
+                                    }
 
-                                            applicant=new BmsApplicant();
-                                            BmsUser bmsUser=new BmsUser();
-                                            bmsUser.setUserId(userId);
-                                            applicant.setBmsUser(bmsUser);
-                                            if(entity.getNationalite()==null) {
-                                                if(account.get().getBmsUser()!=null && account.get().getBmsUser().getNationalite()!=null) {
-                                                    applicant.setNationalite(account.get().getBmsUser().getNationalite());
+                                    BmsApplicant applicantSaved=repo.saveApplicant(applicant);
+
+                                    if(applicantSaved!=null) {
+
+                                        BmsTx tx=new BmsTx();
+                                        BmsTxStatus status=new BmsTxStatus();
+                                        BmsTxType type=new BmsTxType();
+
+                                        BmsInstitution institution=getDefaultInstitution();
+                                        BmsOffice office=this.getDefaultOffice();
+                                        Optional<BmsOfficeService> officeService=repo
+                                                .findBmsOfficeServiceByOfficeId(office.getOfficeId());
+
+
+
+                                        if(office!=null &&
+                                                office.getOfficeId()!=null &&
+                                                officeService.isPresent() ) {
+
+
+                                            tx.setTxId(codeId);
+                                            tx.setTxCode(codeId.toString());
+
+                                            tx.setBmsCalendar(null);
+                                            tx.setBmsOffice(officeService.get().getBmsOffice());
+                                            tx.setBmsService(officeService.get().getBmsService());
+                                            tx.setBmsInstitution(institution);
+                                            status.setStatusId(new BigDecimal(Constants.TX_STATUS_SAISIE));
+
+                                            tx.setBmsTxStatus(status);
+
+                                            type.setId(new BigDecimal(Constants.TX_TYPE_PERSONAL));
+                                            tx.setBmsTxType(type);
+
+                                            tx.setBmsUser(bmsUser);
+                                            tx.setBmsApplicant(applicantSaved);
+                                            tx.setCertificatDate(null);
+                                            tx.setCheckIn(null);
+                                            tx.setCheckOut(null);
+                                            tx.setCreatedDate(DateHelper.toDate());
+                                            tx.setCretedBy(account.get().getAccountId());
+                                            tx.setIsCurrent(new BigDecimal(Constants.CURRENT_TRANSACTION));
+
+                                            BmsTx txSaved=repo.saveTx(tx);
+                                            if(txSaved!=null) {
+                                                BmsTxProcess process=new BmsTxProcess();//txSaved=repo.getTxRepository().save(tx);
+                                                process.setId(codeId);
+                                                process.setTxid(codeId);
+                                                process.setBmsUser(bmsUser);
+                                                process.setStartDate(DateHelper.toDate());
+                                                process.setStartDateStr(DateHelper.DateToString(process.getStartDate()));
+                                                process.setStatus(new BigDecimal(Constants.TX_PROCESS_STATUS_OPEN));
+                                                BmsTxProcess processSaved=repo.saveTxProcess(process);
+
+                                                tx.setBmsTxProcess(process);
+                                                txSaved=repo.saveTx(tx);
+                                                if(processSaved!=null && txSaved!=null) {
+                                                    response.setSuccess(true);
+                                                    response.setPersonalId(codeId);
+                                                    return Mono.just(response);
                                                 }
 
-
-                                            }else {
-                                                applicant.setNationalite(entity.getNationalite());
                                             }
 
-                                            applicant.setApplicantId(codeId);
-                                            applicant.setCreatedDate(DateHelper.toDate());
-                                            applicant.setPersonnal(entitySaved);
+                                        }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ Default Office || Default Service }} not exits") ;}
 
 
-                                            if(personal.getIsCitizen().equals(new BigDecimal(Constants.TYPE_CITIZEN))) {
-                                                applicant.setCitizen("0");
-                                            }
-                                            else if(personal.getIsCitizen().equals(new BigDecimal(Constants.TYPE_MINEUR))) {
-                                                applicant.setCitizen("1");
-                                            }
-
-                                            BmsApplicant applicantSaved=repo.getApplicantRepository().save(applicant);
-
-
-
-                                            if(applicantSaved!=null) {
-
-                                                BmsTx tx=new BmsTx();
-                                                BmsTxStatus status=new BmsTxStatus();
-                                                BmsTxType type=new BmsTxType();
-
-                                                BmsInstitution institution=getDefaultInstitution();
-                                                BmsOffice office=getDefaultOffice();
-                                                Optional<BmsOfficeService> officeService=repo
-                                                        .getOfficeServiceRepository()
-                                                        .findBmsOfficeServiceByOfficeId(office.getOfficeId());
-
-
-
-                                                if(office!=null &&
-                                                        office.getOfficeId()!=null &&
-                                                        officeService.isPresent() ) {
-
-
-                                                    tx.setTxId(codeId);
-                                                    tx.setTxCode(codeId.toString());
-
-                                                    tx.setBmsCalendar(null);
-                                                    tx.setBmsOffice(officeService.get().getBmsOffice());
-                                                    tx.setBmsService(officeService.get().getBmsService());
-                                                    tx.setBmsInstitution(institution);
-                                                    status.setStatusId(new BigDecimal(Constants.TX_STATUS_SAISIE));
-
-                                                    tx.setBmsTxStatus(status);
-
-                                                    type.setId(new BigDecimal(Constants.TX_TYPE_PERSONAL));
-                                                    tx.setBmsTxType(type);
-
-                                                    tx.setBmsUser(bmsUser);
-                                                    tx.setBmsApplicant(applicantSaved);
-                                                    tx.setCertificatDate(null);
-                                                    tx.setCheckIn(null);
-                                                    tx.setCheckOut(null);
-                                                    tx.setCreatedDate(DateHelper.toDate());
-                                                    tx.setCretedBy(account.get());
-                                                    tx.setIsCurrent(new BigDecimal(Constants.CURRENT_TRANSACTION));
-
-                                                    BmsTx txSaved=repo.getTxRepository().save(tx);
-                                                    if(txSaved!=null) {
-                                                        BmsTxProcess process=new BmsTxProcess();//txSaved=repo.getTxRepository().save(tx);
-                                                        process.setId(codeId);
-                                                        process.setTxid(codeId);
-                                                        process.setBmsUser(bmsUser);
-                                                        process.setStartDate(DateHelper.toDate());
-                                                        process.setStartDateStr(DateHelper.toDate(DateHelper.toDate()));
-                                                        process.setStatus(new BigDecimal(Constants.TX_PROCESS_STATUS_OPEN));
-                                                        BmsTxProcess processSaved=repo.getTxProcessRepository().save(process);
-
-                                                        tx.setBmsTxProcess(process);
-                                                        txSaved=repo.getTxRepository().save(tx);
-                                                        if(processSaved!=null && txSaved!=null) {
-                                                            message.setSuccess(true);
-                                                            message.setPersonalId(codeId);
-                                                            return message;
-                                                        }
-
-                                                    }
-
-                                                }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ Default Office || Default Service }} not exits") ;}
-
-
-                                            }
-
-
-                                        }
-                                        //entitySaved=dao.saveApplicant(applicant)
-
-
-
-                                    }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  User has max number active transaction") ;}
-
-
-                                }else {
-
-                                    if(isUserHaveMaxTransaction==false && currentTxId!=null) {
-
-
-                                        if(personal.getApplicantId().equals(currentTxId)) {
-                                            Optional<BmsApplicantsPesonnal> appPerso=repo.getApplicantsPesonnalRepository().findById(currentTxId);
-
-                                            if(appPerso.isPresent()) {
-                                                entity.setCreatedDate(appPerso.get().getCreatedDate());
-                                                entity.setCreateBy(userId);
-                                                entity.setUpdateDate(DateHelper.toDate());
-                                                entitySaved=repo.getApplicantsPesonnalRepository().save(entity);
-                                                message.setSuccess(true);
-                                                message.setPersonalId(appPerso.get().getApplicantId());
-                                                return message;
-                                            }
-                                        }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  currentTxId transaction is different from ApplicantId") ;}
-
-
-
-                                    }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  User has max number active transaction") ;}
+                                    }
 
 
                                 }
 
 
 
+                        }else {
 
-                            }else{ 	throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ Form is Already Submit and Sign  }}  ") ;}}
+                            if(currentTxId!=null) {
+
+                                if(personal.getApplicantId().equals(currentTxId)) {
+                                    Optional<BmsApplicantsPersonal> appPerso=repo.findPersonalById(currentTxId);
+
+                                    if(appPerso.isPresent()) {
+                                        entity.setCreatedDate(appPerso.get().getCreatedDate());
+                                        entity.setCreateBy(userId);
+                                        entity.setUpdateDate(DateHelper.toDate());
+                                        entitySaved=repo.savePersonal(entity);
+                                        response.setSuccess(true);
+                                        response.setPersonalId(appPerso.get().getApplicantId());
+                                        return Mono.just(response);
+                                    }
+                                }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  currentTxId transaction is different from ApplicantId") ;}
 
 
 
-                   // }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm {{ UserId session  }} not exits") ;}
+                            }else{ throw new  ApplicationException(" Error::BookingServicesImpl::newApplicantForm  User has max number active transaction") ;}
 
 
+                        }
 
-                });
+                    return Mono.just(response);
+             });
+
+
 
     }
 /*
@@ -344,7 +304,7 @@ public class ApplicantService {
         return null;
     }*/
     private BmsInstitution getDefaultInstitution() throws ApplicationException {
-        Optional<BmsInstitution> institution=repo.getInstitutionRepository().findById(new BigDecimal(Constants.DEFAULT_INSTITUTION_ID));
+        Optional<BmsInstitution> institution=repo.getInstitutionById(new BigDecimal(Constants.DEFAULT_INSTITUTION_ID));
         if(institution.isPresent()) {
             return institution.get();
         }else {
@@ -360,7 +320,9 @@ public class ApplicantService {
             throw new  ApplicationException(" Error::BookingServicesImpl::getDefaultSetting  Default Setting not exits") ;
         }
     }
-
+    public BmsOffice getDefaultOffice() {
+        return repo.getBmsOfficeCentral(new BigDecimal(Constants.CENTRAL_OFFICE),getDefaultInstitution().getInstitutionId()).get();
+    }
 
 
 
